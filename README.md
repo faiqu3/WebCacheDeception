@@ -43,7 +43,7 @@ Options:
 
 ## 📖 Examples
 
-### 1️⃣ Basic scan
+### 1️. Basic scan
   Scans all URLs listed in urls.txt using the provided session cookie.
   Searches for reflected cookies in the HTTP response that might be cached by the server.
 
