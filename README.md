@@ -25,10 +25,6 @@ These flaws are dangerous because if sensitive data is cached publicly, other us
 ## 🛠 Usage
 
 ### Basic Scan
-```bash
-node wcd-scanner.js https://example.com/my-account
-
-```
 
 ```
 Usage: ./wcd-scanner.sh --urlfile <file_with_urls> --cookie "<name=value; ...>" [options]
