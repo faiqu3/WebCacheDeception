@@ -58,7 +58,8 @@ Search for a specific keyword (e.g., api_key) in the cached response body.
 ./wcd-scanner.sh --urlfile urls.txt --cookie "session=abc123" --customreflection "api_key"
 ```
 📹 Proof of Concept Video
-[![Watch the video](https://img.youtube.com/vi/flCVrDZJp9g/0.jpg)](https://youtu.be/flCVrDZJp9g)
+
+[![Watch the video](https://img.youtube.com/vi/flCVrDZJp9g/0.jpg)](https://youtu.be/c5ft2xnJ99k)
 
 ### 3. Verbose mode (show all HTTP requests)
 
