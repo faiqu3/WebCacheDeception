@@ -1,81 +1,255 @@
-# Web Cache Deception (WCD) Scanner
+# 🕸️ WCD - web cache deception scanner
 
-## 📌 Description
-The **Web Cache Deception (WCD) Scanner** is a penetration testing utility that helps detect websites vulnerable to **Web Cache Deception attacks**.
+A **reflection-driven Web Cache Deception scanner** that verifies whether **user-controlled values are reflected** in responses and, **only if reflected**, checks whether that response is **cacheable**.
 
-It checks for:
+This tool is built to answer one real question:
 
-- **Reflected cookies** – when a cookie value is echoed back in a page’s response and could be stored in a public cache.
-- **Custom reflection points** – when user-controlled input or sensitive data such as API keys appears in the response and might be cached, as demonstrated in [PortSwigger’s WCD lab](https://portswigger.net/web-security/web-cache-deception/lab-wcd-exploiting-path-mapping).
-  
-These flaws are dangerous because if sensitive data is cached publicly, other users (or attackers) could retrieve it later.
+> “Is my reflected data being cached and served back?”
+
+If the answer is yes — that’s impact.
 
 ---
 
-## 🚀 Features
-- Detects **Web Cache Deception** vulnerabilities.
-- Identifies **reflected cookies** and **custom reflected data** in cacheable responses.
-- **Verbose mode** (`--vv`) to display every request sent.
-- **Proxy support** (`--proxy`) to route traffic through Burp Suite, OWASP ZAP, etc.
-- **Color-coded output** for quick reading.
-- Supports **custom wordlists** for URLs and file extensions.
+## 🚀 What This Tool Actually Does
+
+This scanner:
+
+* Injects **random static file paths** (`.css`, `.js`, `.png`, etc.)
+* Appends **unique `?hackmeXXXX` parameters**
+* Sends **authenticated requests using cookies**
+* Searches responses for **user-supplied reflection values**
+* **Only when reflection is detected**:
+
+  * Extracts cache-related headers
+  * Highlights possible cache exposure
+* Runs in **parallel** for speed
+* Skips redirects (3xx) by default to reduce noise
+
+No reflection → no cache analysis → no false hype.
 
 ---
 
-## 🛠 Usage
+## 🎯 Use Cases
 
-### Basic Scan
+### 🧑‍💻 Bug Bounty Hunters
 
-```
-Usage: ./wcd-scanner.sh --urlfile <file_with_urls> --cookie "<name=value; ...>" [options]
+* Prove **user-controlled reflection**
+* Confirm whether reflected content is cacheable
+* Find **real Web Cache Deception bugs**
+* Generate clean, defensible reports
 
-Required:
-  --urlfile <file>         File containing target base URLs (one per line)
-  --cookie "<cookie_str>"  Cookie string to send with each request
+### 🏢 Companies & Security Teams
 
-Options:
-  --customreflection <str> Custom string to search for in response body
-  --output <file>          Save results to a log file
-  --proxy <url>            Route requests via a proxy (e.g., http://127.0.0.1:8080)
-  --vv                     Verbose mode — logs every request and status code
-  -h, --help               Show this help message
-```
+* Detect reflection + caching combos
+* Validate CDN and proxy behavior
+* Prevent sensitive data from being cached
+* Reduce real-world data exposure risk
 
-## 📖 Examples
+---
 
-### 1️. Basic scan
-  Scans all URLs listed in urls.txt using the provided session cookie.
-  Searches for reflected cookies in the HTTP response that might be cached by the server.
+## 📦 Requirements
+
+* Bash
+* curl
+* Standard GNU utilities
+* Linux / macOS
+
+---
+
+## 📥 Installation
 
 ```bash
-./wcd-scanner.sh --urlfile urls.txt --cookie "session=abc123"
+git clone https://github.com/yourusername/reflection-cache-scanner.git
+cd reflection-cache-scanner
+chmod +x scanner.sh
 ```
 
-### 2. Scan with custom reflection detection
+---
 
-Search for a specific keyword (e.g., api_key) in the cached response body.
-```
-./wcd-scanner.sh --urlfile urls.txt --cookie "session=abc123" --customreflection "api_key"
-```
-📹 Proof of Concept Video
+## 🛠️ Usage
 
-[![Watch the video](https://img.youtube.com/vi/flCVrDZJp9g/0.jpg)](https://youtu.be/c5ft2xnJ99k)
+### 🔴 Basic Scan (Reflection Is REQUIRED)
 
-### 3. Verbose mode (show all HTTP requests)
+```bash
+./scanner.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  --reflection "abc123"
+```
 
-Log every request sent and its status code.
-```
-./wcd-scanner.sh --urlfile urls.txt --cookie "session=abc123" --vv
-```
-### 4. Route through proxy (e.g., Burp Suite)
+> Without `--reflection`, the tool cannot determine whether data is reflected or cached.
 
-Send traffic via a proxy for deeper inspection.
-```
-./wcd-scanner.sh --urlfile urls.txt --cookie "session=abc123" --proxy http://127.0.0.1:8080
-```
-### 5. Combine options (verbose + proxy + output file)
+---
 
-Run a detailed scan, route via proxy, and save results to a file.
+### Multiple Reflection Values
+
+```bash
+./scanner.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  --reflection "abc123,email,@example.com"
 ```
-./wcd-scanner.sh --urlfile urls.txt --cookie "session=abc123" --vv --proxy http://127.0.0.1:8080 --output results.log
+
+Each value is tested independently.
+
+---
+
+### Match Specific Status Codes
+
+(Default behavior skips 3xx responses)
+
+```bash
+./scanner.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  -mc 200,404
 ```
+
+---
+
+### Increase Speed (Parallel Requests)
+
+```bash
+./scanner.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  --reflection "abc123" \
+  -t 20
+```
+
+---
+
+### Save Output
+
+```bash
+./scanner.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  --output findings.txt
+```
+
+---
+
+### Proxy Traffic (Burp / ZAP)
+
+```bash
+./scanner.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  --reflection "abc123" \
+  --proxy http://127.0.0.1:8080
+```
+
+---
+
+### Very Verbose Mode
+
+```bash
+./scanner.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  --reflection "abc123" \
+  --vv
+```
+
+---
+
+## ⚙️ Option Reference
+
+| Flag                | Description                                |
+| ------------------- | ------------------------------------------ |
+| `--urlfile`         | File with target base URLs                 |
+| `--cookie`          | Cookie header for authenticated testing    |
+| `--reflection`      | **Required** value(s) to detect reflection |
+| `--output`          | Save output to file                        |
+| `--proxy`           | HTTP proxy                                 |
+| `-mc, --match-code` | Only test specific HTTP status codes       |
+| `-t, --thread`      | Parallel requests (default: 10)            |
+| `--vv`              | Very verbose logging                       |
+| `-h, --help`        | Show help                                  |
+
+---
+
+## 🧠 How Detection Works
+
+1. Base URL is normalized (no query / fragment)
+2. Random static paths are appended:
+
+   ```
+   /x7k9q2.css?hackme3482
+   ```
+3. Authenticated request is sent
+4. Response body is searched for reflection values
+5. **If reflection is found**:
+
+   * Cache headers are extracted
+   * Cache exposure is highlighted
+6. If no reflection → request is ignored
+
+This ensures **high signal, low noise**.
+
+---
+
+## 📄 Example Finding
+
+```text
+[+] URL: https://target.com/a1b2c3.css?hackme1029
+    Status: 200
+    Reflections found:
+      - Reflected: abc123
+    Cache-Relevant Headers:
+      - Cache-Control: public, max-age=3600
+      - Age: 87
+```
+
+Reflection + cache headers = 🚨 potential WCD.
+
+---
+
+## 🧠 Bounty Hunter Notes
+
+* Always verify with a **fresh unauthenticated request**
+* Focus on:
+
+  * `Cache-Control: public`
+  * `Age` headers
+  * CDN-backed targets
+* Reflected secrets = higher impact
+* Static extension paths often bypass cache rules
+
+---
+
+## 🛡️ Remediation (For Companies)
+
+* Disable caching on authenticated routes
+* Use:
+
+  ```
+  Cache-Control: private, no-store
+  ```
+* Review CDN edge rules
+* Ensure reflected user data is never cached
+
+---
+
+## ⚠️ Legal Disclaimer
+
+Scan only:
+
+* Assets you own
+* Assets you’re authorized to test
+* Public bounty scope targets
+
+Use responsibly.
+
+---
+
+## ⭐ Final Words
+
+This tool is about **proof**, not guesses.
+Reflection first. Cache second. Impact always.
+
+If it helps you win:
+⭐ the repo
+Use it smart
+Hack ethically 🔥
