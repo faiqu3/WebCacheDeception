@@ -22,7 +22,7 @@ show_help() {
   echo "  --cookie STRING          Cookie header (e.g. 'session=abc; token=1')"
   echo
   echo -e "${BOLD}Optional:${RESET}"
-  echo "  --customreflection TEXT  Additional reflection string(s) to search (comma-separated)"
+  echo "  --reflection TEXT  Additional reflection string(s) to search (comma-separated)"
   echo "  --output FILE            Save output to file"
   echo "  --proxy URL              HTTP proxy (e.g. http://127.0.0.1:8080)"
   echo "  -mc, --match-code CODES  Only test these HTTP codes (e.g. 200 or 200,404)"
