@@ -55,6 +55,15 @@ chmod +x wcd_stag.sh
   --reflection WCD_TEST
 ```
 
+### Multiple Reflection Values (Comma-Separated)
+
+```bash
+./wcd_stag.sh \
+  --urlfile urls.txt \
+  --cookie "session=abc123" \
+  --reflection "wiener,TEST123,SWxJ7euu8dfGdhdS6cih0vhC47aRvRjn"
+```
+
 ### With Burp proxy
 
 ```bash
